@@ -1,10 +1,26 @@
-let globalCharacters = []
+const prompt = require("prompt-sync")({ sigint: true });
+const globalCharacters = []
+const wiz = []
+const tech = []
+const elem = []
+const quiz = [{"title": "What is the colour of Sub Zero? A) Blue, B) Green, C) Yellow", "answer" : "A"},
+              {"title": "What material are Jax's arms? A) Wood, B) Granite C) Metal", "answer": "C"},
+              {"title" : "What is scorpions signature catch phrase after throwing his spear? A) GET OVER HERE, B) THESE FLAMES WILL BURN C) DEATH TO YOU", "answer":"A"},
+              {"title" : "Who is the second to last boss in MK2? A) Goro, B) Kintaro, C) Motaro", "answer" : "B"},
+              {"title" : "Which mortal kombat character was not featured in MK1? A) Liu Kang, B) Sonya Blade, C) Kung Lao","answer": "C"}]
 // initial object template
 function character(name,catchPhrase,rating,perk){
     this.name = name;
     this.catchPhrase = catchPhrase;
     this.rating = rating;
     this.perk = perk;
+    if (perk === "wizardry"){
+        wiz.push(this)
+    } else if (perk === "elemental") {
+        elem.push(this)
+    } else if (perk === "technical"){
+        tech.push(this)
+    }
     globalCharacters.push(this)
     character.prototype.isAwesome = function(){
         console.log(`I am the beast ${this.name} and I am the best with a rating of ${this.rating} and a catchPhrase of ${this.catchPhrase}! I have the ${this.perk} perk!`)
@@ -28,6 +44,15 @@ function character(name,catchPhrase,rating,perk){
     character.prototype.nameRating = function(){
         console.log(`My name is ${this.name} and my rating is ${this.rating}!`)
     }
+    character.prototype.fullDetails = function(){
+        console.log(`My name is ${this.name} and my rating is ${this.rating} and my perk is ${this.perk}!`)
+    }
+    character.prototype.increment = function(){
+        this.rating++
+    }
+    character.prototype.decrement = function(){
+        this.rating--
+    }
 
 
 }
@@ -44,7 +69,11 @@ const ermac = new character("Ermac", "We are many, but you are one", 85,"wizardr
 const jax = new character("Jax","Gotcha",76,"technical")
 const kenshi = new character("Kenshi","one mind, one blade", 78,"wizardry")
 const shinnok = new character("Shinnok", "Tremble before me", 88,"wizardry")
-const shaokahn = new character("Shao Kahn","Feel the wrath of Shao Kahn!",99,"wizardry")
+const shaokahn = new character("Shao Kahn","Feel the wrath of Shao Kahn!",93,"wizardry")
+const baraka = new character("Baraka","I will eat your flesh",72,"elemental")
+const kotalkahn = new character("Kotal Kahn","Ack-Na ! Kot-tek-kah!",87, "wizardry")
+const sindel = new character("sindel","AAAAAAA - high pitch scream", 92, "wizardry")
+const mileena = new character("mileena","Let us dance!",87,"elemental")
 
  
 character.prototype.game = "Mortal Kombat"
@@ -82,7 +111,7 @@ function addnewChar(globalCharacters){
 }
 //CHECKS CHARACTER RATING
 function ratingCheck(player){
-    return player.nameRating()
+    return player.fullDetails()
 }
 //CHECKS THE BALANCE OF THE GAME
 function checkBalance(globalCharacters){
@@ -125,7 +154,7 @@ function checkBalance(globalCharacters){
 
 //BATTLE FUNCTION
 function battle(player1,player2){
-    let randomize =  Math.floor(Math.random()*2)
+    const randomize =  Math.floor(Math.random()*2)
     let play1;
     let play2;
     console.log(`This fight is between: ${player1.name} (rated currently ${player1.rating}) and ${player2.name} (rated currently ${player2.rating})! `)
@@ -210,6 +239,39 @@ function worstOnly(list1){
         return list1[0].isAwful()
 
 }
+
+function callType(){
+    let userinput = prompt("Please type the perk requested: ")
+    userinput = userinput.toLowerCase()
+    console.log(userinput)
+    let conclude = true
+    while (conclude === true) {
+    if (userinput === "wizardry"){
+        console.log(wiz.length)
+        for (let i = 0; i < wiz.length;i++){
+            wiz[i].fullDetails()
+        }
+        conclude = false
+        break
+    }else if (userinput === "technical"){
+        console.log(tech.length)
+        for (let i = 0; i < tech.length;i++){
+            tech[i].fullDetails()
+        }
+        conclude = false
+        break
+    }else if (userinput === "elemental"){
+        for (let i = 0; i < elem.length;i++){
+            elem[i].fullDetails()
+        }
+        conclude = false
+        break
+    }
+userinput = prompt("sorry, this is incorrect! please select a valid perk style: ")
+}
+
+}
+
 function bestOnly(list1){
     list1.sort(function(a,b){
         for (let i = 0; i < 1; i++){
@@ -217,12 +279,9 @@ function bestOnly(list1){
 }})
     return (list1[0].isAwesome())
 }
-
-let count = 0;
-for (let i = 0; i <globalCharacters.length;i++){
-    count += globalCharacters[i].rating ;
-}
-let averageRating = Math.round(count/globalCharacters.length)
+//GETS ALL OF CHARACTERS RATINGS
+const allRatings = globalCharacters.reduce((sum, globalCharacters) => sum + globalCharacters.rating,0)
+const averageRating = Math.round(allRatings/globalCharacters.length)
 // loops over array
 function callAllCharacters(globalCharacters){
 for (let i = 0; i < globalCharacters.length;i++){
@@ -237,15 +296,9 @@ function callGoodCharacters(globalCharacters){
         if (globalCharacters[i].rating > averageRating){
         globalCharacters[i].isGood();
 }}}
-
-//PlayGame
-function selectMode(globalCharacters){
+function battlePrep(globalCharacters){
     let count = 0
-    
-    const prompt = require("prompt-sync")({ sigint: true });
-    let select = prompt("Do you want to Battle or see the other possible modes? if you want to battle, please type battle, if not type any key.".toLowerCase())
-    if (select === "battle"){
-        while (count <= 1){
+    while (count <= 1){
         count = 0
         let player1 = prompt("Choose your first fighter, please include spaces if they have a space in their name ")
         player1 = player1.toLowerCase()
@@ -265,20 +318,51 @@ function selectMode(globalCharacters){
         }
 
     } if (count > 1){
-    return battle(player1,player2)    
+     battle(player1,player2)    
     }else{
         console.log("Sorry, one of the characters is not a valid character. Please check your spelling and your spaces!")
     }
-        }}
-    //let selectOther = prompt("Please select one of the following:\nCallgoodcharacters\nBestonly\nWorstonly\nCheckbalance\nRatingcheck\nAddnewchar")
-    //console.log(selectOther)
-    }
-//callGoodCharacters(globalCharacters)
-//bestOnly(globalCharacters)
-//worstOnly(globalCharacters)
-//battle(shaokahn,cassie)
-//battle(cassie,shaokahn)
-//battle(shaokahn,cassie)
-//battle(shaokahn,cassie)
-//checkBalance(globalCharacters)
+}
+}
+
+//PlayGame
+function selectMode(globalCharacters){
+    const allModes = [{num : 1, mode : function() {(callGoodCharacters(globalCharacters))}},
+        {num : 2, mode : function (){bestOnly(globalCharacters)}},
+        {num : 3, mode : function () {worstOnly(globalCharacters)}},
+        {num : 4, mode : function () {checkBalance(globalCharacters)}},
+        {num : 5, mode : function () {callAllCharacters(globalCharacters)}},
+        {num : 6, mode : function () {battlePrep(globalCharacters)}},
+        {num : 7, mode :  function () {addnewChar(globalCharacters)}},
+        {num : 8, mode : function () {callType(globalCharacters)}},
+        ]
+    let count = 0
+    let run = false
+    while (run === false){
+    console.log("The modes are one of the following:  1 - Callgoodcharacters,2 - Bestonly,3 - Worstonly,4 - Checkbalance,5 - Ratingcheck, 6 - battle,7 - Addcharacter, 8 - type a perk to see the list of characters, which have the perk")
+     let selectOther = prompt(`Please select the number you need: `)
+     console.log(`Your number is ${selectOther}`) 
+     selectOther = (parseInt(selectOther))
+        if (selectOther === NaN){
+            console.log("sorry this is not a valid number, try again!")
+        }else if ((selectOther < 1) || (selectOther > 8)){
+            console.log("The number does not fall in between numbers 1-6, try again!")
+        }else {
+            for (let key in allModes){
+                if (allModes[key].num === selectOther){
+                    allModes[key].mode(globalCharacters)
+                }
+            }
+        }
+    let conclude = prompt("Are you finished with the game? please type yes if you wish to finish")
+    conclude = conclude.toLowerCase()
+        if (conclude === "yes"){
+            console.log("Your game will now finish!")
+            run = true 
+        }
+    }    
+}
+
+
 selectMode(globalCharacters)
+
