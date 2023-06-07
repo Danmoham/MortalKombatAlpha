@@ -110,8 +110,18 @@ function addnewChar(globalCharacters){
     console.log(`Congratulations! Your new Character ${newChar.name} has been added to the roster!`)
 }
 //CHECKS CHARACTER RATING
-function ratingCheck(player){
-    return player.fullDetails()
+function ratingCheck(globalCharacters){
+    let x = true
+    while (x){
+    let choose = prompt("Please select your character you want to check the details of. Please remember to use spaces when applicable.")
+    choose = choose.toLowerCase()
+    for (let i = 0; i < globalCharacters.length;i++){
+        if ((globalCharacters[i].name.toLowerCase()) === choose){
+        return globalCharacters[i].fullDetails()
+        }
+    }
+    console.log("Sorry, this name is not recognised. Please try again.")
+}
 }
 //CHECKS THE BALANCE OF THE GAME
 function checkBalance(globalCharacters){
@@ -296,6 +306,63 @@ function callGoodCharacters(globalCharacters){
         if (globalCharacters[i].rating > averageRating){
         globalCharacters[i].isGood();
 }}}
+function  preQuiz(globalCharacters){
+    let select = 0
+    while (select <= 0){
+        let player1 = prompt("Choose the fighter you want to use for the quiz")
+        player1 = player1.toLowerCase()
+        for (let i = 0; i < globalCharacters.length;i++){
+        if (player1 === ((globalCharacters[i].name).toLowerCase())){
+            player1 = globalCharacters[i]
+            console.log(`The fighter that will be being quizzed is ${globalCharacters[i].name} with a rating of ${globalCharacters[i].rating} depending on their score will depend on if they get a upgrade or a downgrade`)
+            return playQuiz(player1)
+            select += 1
+        }}
+           console.log("Sorry, one of the characters is not a valid character. Please check your spelling and your spaces!")
+       }
+   }
+
+   function playQuiz(billy){
+    let count = 0
+    let questionCounter = prompt("How many questions would you like to be asked? Please reply only with a number.")
+    questionCounter = parseInt(questionCounter)
+    while ((questionCounter > quiz.length && questionCounter > 0) || isNaN(questionCounter)){
+        questionCounter = prompt(`This has to be a number and has to be less than or equal to the the length of the quiz which is ${quiz.length}!`)
+    }
+    const arrQuestions = []
+    let questionsRecord = 0
+    let x = (quiz[Math.floor(Math.random() * quiz.length)])
+    while (questionCounter > questionsRecord){
+    while (arrQuestions.indexOf(x) !== -1){
+     x = (quiz[Math.floor(Math.random() * quiz.length)])
+    }
+    console.log(x.title)
+    let user = prompt("please select the option A B or C")
+    while (user.length > 1){
+        user = prompt("PLEASE ENSURE YOU ENTER ONLY ONE LETTER, A, B OR C!!!")
+    }
+    user = user.toUpperCase()
+    if (x.answer === user){
+        count += 1
+        console.log(`That is correct!`)
+    }else{
+        count -= 1
+        console.log(`That is wrong, the answer was ${x.answer}!`)
+    }
+    arrQuestions.push(x)
+    questionsRecord += 1
+    }
+    if (count > 0){
+        billy.increment()
+        console.log(`${billy.name}'s rating has now improved by one point to ${billy.rating}, due to having a positive number of answers`)
+    }else if ( 0 > count){
+        billy.decrement()
+        console.log(`${billy.name}'s rating has now dropped by one point to ${billy.rating}, due to having too many incorrect answers`)
+    }else{
+        console.log(`${billy.name}'s rating will remain the same`)
+    }
+}
+
 function battlePrep(globalCharacters){
     let count = 0
     while (count <= 1){
@@ -328,24 +395,30 @@ function battlePrep(globalCharacters){
 //PlayGame
 function selectMode(globalCharacters){
     const allModes = [{num : 1, mode : function() {(callGoodCharacters(globalCharacters))}},
-        {num : 2, mode : function (){bestOnly(globalCharacters)}},
-        {num : 3, mode : function () {worstOnly(globalCharacters)}},
-        {num : 4, mode : function () {checkBalance(globalCharacters)}},
-        {num : 5, mode : function () {callAllCharacters(globalCharacters)}},
-        {num : 6, mode : function () {battlePrep(globalCharacters)}},
-        {num : 7, mode :  function () {addnewChar(globalCharacters)}},
-        {num : 8, mode : function () {callType(globalCharacters)}},
+        {num : 1, mode : function (){bestOnly(globalCharacters)}, description : "Callgoodcharacters only"},
+        {num : 2, mode : function () {worstOnly(globalCharacters)}, description : "the worst only character"},
+        {num : 3, mode : function () {checkBalance(globalCharacters)}, description : "Check the balance of the game"},
+        {num : 4, mode : function () {callAllCharacters(globalCharacters)}, description : "Call all characters"},
+        {num : 5, mode : function () {battlePrep(globalCharacters)}, description : "Battle"},
+        {num : 6, mode :  function () {addnewChar(globalCharacters)}, description : "add new character"},
+        {num : 7, mode : function () {callType(globalCharacters)}, description : "Call perk type to check how many characters have this perk"},
+        {num : 8, mode : function () {preQuiz(globalCharacters)}, description : "thequiz"},
+        {num : 9, mode : function () {ratingCheck(globalCharacters)}, description : "Check the rating for a specific character"}
         ]
     let count = 0
     let run = false
     while (run === false){
-    console.log("The modes are one of the following:  1 - Callgoodcharacters,2 - Bestonly,3 - Worstonly,4 - Checkbalance,5 - Ratingcheck, 6 - battle,7 - Addcharacter, 8 - type a perk to see the list of characters, which have the perk")
+        console.log("The modes are the following")
+        for (let i = 1; i < allModes.length; i++){
+            console.log(`Mode ${allModes[i].num} is ${allModes[i].description}!`)
+        }
+// console.log("The modes are one of the following:  1 - Callgoodcharacters,2 - Bestonly,3 - Worstonly,4 - Checkbalance,5 - Ratingcheck, 6 - battle,7 - Addcharacter, 8 - type a perk to see the list of characters, which have the perk")
      let selectOther = prompt(`Please select the number you need: `)
      console.log(`Your number is ${selectOther}`) 
      selectOther = (parseInt(selectOther))
         if (selectOther === NaN){
             console.log("sorry this is not a valid number, try again!")
-        }else if ((selectOther < 1) || (selectOther > 8)){
+        }else if ((selectOther < 1) || (selectOther > allModes.length)){
             console.log("The number does not fall in between numbers 1-6, try again!")
         }else {
             for (let key in allModes){
@@ -365,4 +438,3 @@ function selectMode(globalCharacters){
 
 
 selectMode(globalCharacters)
-
